@@ -105,7 +105,7 @@ It is called _I-type_ instruction (for immediate), as different from _R-type_ in
 
 Operations on single bit instead of the entire word.
 
-1. Shifting
+##### 1. Shifting
 
     sll $t2,$s0,4 # reg $t2 = reg $s0 << 4 bits
 
@@ -116,13 +116,13 @@ Operations on single bit instead of the entire word.
 - R-type
 - shifting left by `i` bits is the same as multiplying by `2^i`
 
-2. AND operation
+##### 2. AND operation
 
     and $t0,$t1,$t2 # reg $t0 = reg $t1 & reg $t2
 
 - used as a mask to hide or filter bits pattern
 
-3. OR/NOR operation
+##### 3. OR/NOR operation
 
     or $t0,$t1,$t2 # reg $t0 = reg $t1 | reg $t2
     nor $t0,$t1,$t3 # reg $t0 = ~ (reg $t1 | reg $t3)
@@ -135,7 +135,7 @@ Operations on single bit instead of the entire word.
 
 Instructions making decisions based on input data
 
-##### 1. _if/else_
+##### 1. if/else
 
 For a simple condition check:
 
