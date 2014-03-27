@@ -58,6 +58,16 @@ Now the `CPU time` could be rewritten:
 
     CPU Time = # of instructions per program x CPI x clock period
 
-**Big picutre**: the performance of CPU of a particular program now depend on the combination of 3 different measurements. Optimization of only 1 measurement might not lead to improvement over performance as it most likely would decrease another measurement. Trade-off/balance among 3 measurements would be important.
+**Big picutre**: the performance of CPU of a particular program now depend on the combination of 3 different measurements. 
+- Improvement on a subset of the 3 measurements does not equal to improvement.
+- The improvement on the performance, given a certain improvement is limited by the amount the improved feature is used.
 
+Another way to measure the performance: Million instructions per second (MIPS)
+
+    MIPS = instruction count / (10^6 x execution time)
+
+Faster machines have higher `MIPS`, however:
+- it does not take into account capabilities of different instructions. Computer with lower `MIPS` could be capable of executing more complex tasks
+- it varies for different programs on the same computer
+- it is not consistent with the `CPU Time` measurement. Program with faster execution time could have lower `MIPS`!
 
