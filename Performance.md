@@ -1,5 +1,4 @@
 ## Measuring performance
-========================
 
 Performance should be judged by several different metrics for different computers (e.g personal computer, server)
 
@@ -26,6 +25,8 @@ However the execution time varies for one task if it is running on different CPU
 
 ### CPU Performance
 ***
+
+Elapsed time: all the time needed to perform one application while CPU is multiplexing multiple tasks
 
     Elapsed time = CPU time + Access time + Overhead
 
