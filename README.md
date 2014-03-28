@@ -1,7 +1,7 @@
 Computer Architecture Notes
 =========================
 
-Notebook for Computer Architecture qualification exam.
+Notebook for Computer Architecture basics.
 
 Topics:
 
