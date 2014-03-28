@@ -132,5 +132,11 @@ Now simple datapath with controls AND jump function:
 ![Datapath with control](images/datapath_with_control.png)
 
 - jump is implemented [TODO:fix]
+- how to implement `jal`?
 
+### Single-cycle is bad
+
+- because the clock cycle of single-cycle datapath is determined by the slowest instruction
+- cannot make common case fast
+- units cannot be shared during a clock cycle (?)
 
