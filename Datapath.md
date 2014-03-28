@@ -1,15 +1,17 @@
 ## Datapath
+===========
 
     CPU Time = # of instructions per program x CPI x clock period
 
 Both CPI and clock period are determined by the processor. This note will use a simplified version of process as example. This processor includes 
+
 1. memory-reference: `lw`, `sw`
 2. arithmetic-logical: `and`, `sub`, `or`, `and`, `slt`
 3. control flow: `beq`, `j`.
 
-![MIPS simple simplementation](images/an_mips_implementation.png)
-
 ### Single-cycle datapath
+
+***
 
 #### Some conventions
 
