@@ -7,4 +7,5 @@ Topics:
 
 - performance measurement
 - instruction sets
-- go on...
+- datapath
+- ...
