@@ -181,3 +181,85 @@ Some special instructions for 2 registers comparison:
 
 - put 1 into `$t0` if `$s3` is smaller than `$s4`
 - also has a immediate/constant version
+
+#### Procedure
+
+A procedure (subroutine) is a part of the program that is to complete a specific subtask. Like a function, takes input and returns output with leaving any other traces.
+
+1. (caller) Place parameters in a place where the procedure (callee) can access them.
+2. Transfer control to the procedure.
+3. Acquire the storage resources needed for the procedure.
+4. Perform the desired task.
+5. Place the result value in a place where the calling program can access it.
+6. Return control to the point of origin, since a procedure can be called from several points in a program.
+
+##### Naming of registers
+
+Registers put into use:
+
+- `$a0` to `$a3`: 4 argument registers
+- `$v0` and `$v1`: 2 return registers
+- `$ra`: return register, stores the address of the origin (caller)
+
+Instructions to use:
+
+- `jal LABEL`: jump-and-link, for caller to jump to the subroutine (calee) and save the address of following instruction into `$ra`
+     - what is a following instruction?
+- `jr $ra`: for callee to return to the caller
+
+What if more registers are needed, say 3 or more return values?
+
+- keep origin values (from caller) of registers into memory
+- use registers
+- write origin values back accordingly before `jr`
+- `$s0` to `$s7` are ones needed to keep/write-back
+- `$t0` to `$t9` could be used directly without storing
+
+##### Register spilling
+
+How to store origin values?
+
+- use a _stack_ with a _stack_ _pointer_ called `$sp`
+- `$sp` is a register storing the address of the top item in the stack
+- _stack_ begins at high address and continue to lower address
+- used by callee to store origin values
+    - allocate sufficient address in the stack: `addi $sp, $sp, -12`
+    - store values of needed registers into memory using `sw` (offset being `8`, `4`, `0`, respectively)
+    - callee does stuff
+    - restore values using `lw`
+    - adjust `$sp` to delete items from the stack: `addi $sp, $sp, 12`
+    - return to caller using `jr`
+    - what is the assembly code for a procedure takes into more than 4 arguments?
+
+![Stack usage](images/stack_pointer.png)
+
+##### Nested procedures
+
+For procedures that nested in each other (e.g. recursion), we have to also store `$ra` and `$aX` values to memory for each procedure.
+
+- how?
+
+##### Local variables of a procedure
+
+If local variables of a procedure cannot be stored in registers, they will be stored in _procedure_ _frame_.
+
+- procedure frame is a part fo the _stack_
+- `$fp` is the register stores the address of the first variable in procedure frame
+- arguments of a procedure that cannot be fitted in registers could also be stored in procedure frame
+- `$fp` actually stores the origin `$fp` value before a call of procedure
+- `$sp` could be changed, but `$fp` is stable within a procedure
+
+![Procedure frame](images/frame_pointer.png)
+
+##### Allocating space for static and dynamic data
+
+![Memory allocation](images/memory_allocation.png)
+
+- memory beyond `$pc` is reserved
+- _Text_ is the place where MIPS machine codes are stored
+- _Static_ is for constants and static variables
+- _Dynamic_ data is for storing data structures that would grow/shrink dynamically such as linked list
+    - Dynamic is called _heap_
+- _Stack_ is for saving values of registers for procedures
+- _Stack_ and _Dynamic_ grow to each other, so that to use memory efficiently
+
