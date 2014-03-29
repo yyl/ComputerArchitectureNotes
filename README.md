@@ -8,4 +8,4 @@ Topics:
 - performance measurement
 - instruction sets
 - datapath
-- ...
+- pipeline
