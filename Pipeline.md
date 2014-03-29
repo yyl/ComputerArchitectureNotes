@@ -38,7 +38,7 @@ Hazards in pipelining include:
 
 #### Pipeline diagram
 
-![Pipeline diagram](images/pipleline_diagram.png)
+![Pipeline diagram](images/pipeline_diagram.png)
 
 - each stage is represented by its physical resources used
     - IM: **IF** from instruction machine
@@ -46,17 +46,36 @@ Hazards in pipelining include:
     - ALU: **EX** using Algebraic logic unit
     - DM: **MEM** read/write to data memory
     - Reg: **WB** write data back to register
+- each stage, _write_ in 1st half, _read_ in 2nd half
+    - this enables read and write in the same cycle
 - between each pair of two adjcent stages there is a pipeline register
     - any information in later stage must be passed to that stage via a pipeline register
+- no write signal for either PC or any pipeline register
+    - they are written on each clock cycle
 
 diagram of `lw $1, 100($0)`,
 
 ![load word diagram](images/lw_diagram.png)
 
-For each read/write stage, _write_ in 1st half, _read_ in 2nd half; this enables read and write in the same cycle
-
-1. **Read** instruction
-2. decode the instruction and **read** register storing memory address (`$0`)
-3. calculating memory address
-4. **read** from memory
+1. **read** instruction from meory using `$pc`, place it in IF/ID register
+2. decode the instruction, get register numbers, **read** two registers, pass results and a extended 32-bit immediate to ID/EX register
+3. adds immediate and value of register `$0`, put the sum into EX/MEM register
+4. **read** from memory using data from EX/MEM register, then place data into MEM/WB register
 5. **write** the data to register (`$1`)
+
+diagram of `sw $15, 100($2)`,
+
+![Store word diagram](images/sw_diagram.png)
+
+The 1st and 2nd steps of all instructions are the same: **read** instruction, decode and **read** register files
+
+3. calculating memory address and put it to EX/MEM register
+4. **write** data to target memory address
+5. NOTHING happens here.
+
+diagram for `add`, `sub`, `or`, `and` are similar,
+
+![Add diagram](images/add_diagram.png)
+
+- no memory access
+- in 5th stage, **write** the result into target register
