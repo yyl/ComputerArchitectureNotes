@@ -1,4 +1,5 @@
-## Instructions
+Instructions
+===
 
 > To communicate with the computer, you have to speak its language
 
@@ -8,18 +9,18 @@ It is called _instructions_.
 - primitive
 - use _MIPS_ as example below
 
-***
-
 ### Four prinsciples of hardware design
+
+***
 
 1. Simplicity favors regularity
 2. Smaller is faster
 3. Make the common case fast
 4. Good design demands good compromises.
 
-***
-
 #### Basics of a line of assembly language
+
+***
 
     add a, b, c
 
@@ -32,9 +33,9 @@ It is called _instructions_.
     - all registers are named as `$xk`, `x` is a character and `k` is a number
     - (**2**): large number of registers would increase clock cycle by longer traveling for eletronic signals
 
-***
-
 #### Memory operand
+
+***
 
 Registers are limited, but a program might need to access more data than the amount allowed to be stored in registers. Therefore, machine stores data in _memory_ and use _data_ _transfer_ operations to switch them in/out registers. The data in memory is located by their _address_.
 
@@ -65,9 +66,9 @@ Operating on constant is a common case (e.g. increment a count), it would ineffi
 
 (**3**): Reduce the time of common case such as constant operands.
 
-***
-
 #### Machine language
+
+***
 
 How such instructions are represented in the copmuters? _Not_ string, but _integers_:
 
@@ -99,9 +100,9 @@ It is called _I-type_ instruction (for immediate), as different from _R-type_ in
 - `rt` becomes the destination field
 - (**4**) to keep all instructions the same length while providing different functions for different instructions
 
-***
-
 #### Logic operations
+
+***
 
 Operations on single bit instead of the entire word.
 
@@ -183,6 +184,8 @@ Some special instructions for 2 registers comparison:
 - also has a immediate/constant version
 
 #### Procedure
+
+***
 
 A procedure (subroutine) is a part of the program that is to complete a specific subtask. Like a function, takes input and returns output with leaving any other traces.
 
