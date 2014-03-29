@@ -28,6 +28,8 @@ Hazards in pipelining include:
 
 ### Representation of pipeline
 
+***
+
 **Five-stage** of an instruction
 
 1. IF: Instruction Fetch
@@ -67,8 +69,8 @@ diagram of `sw $15, 100($2)`,
 
 ![Store word diagram](images/sw_diagram.png)
 
-The 1st and 2nd steps of all instructions are the same: **read** instruction, decode and **read** register files
-
+1. Same as `lw`: **read** instruction
+2. Same as `lw`: decode and **read** register files
 3. calculating memory address and put it to EX/MEM register
 4. **write** data to target memory address
 5. NOTHING happens here.
@@ -79,3 +81,112 @@ diagram for `add`, `sub`, `or`, `and` are similar,
 
 - no memory access
 - in 5th stage, **write** the result into target register
+
+### Data hazards and Forwarding
+
+***
+
+An example,
+
+![Data hazard example](images/data_hazard.png)
+
+- last 4 instructions all depend on the result in `$2`, which is calculated by the 1st instruction.
+- but only 2nd and 3rd instructions create data hazard
+- only focus on forwarding to an operation in the **EX** stage
+
+#### detection of a data hazard
+
+In the graph above, the 1st hazard occurs when `sub` is in MEM stage and following `and` is in EX stage at register `$2`:
+
+    EX/MEM.RegisterRd = ID/EX.RegisterRs = $2
+
+This is the detection rule of this type of hazard. A list of similar rules:
+    
+    EX/MEM.RegisterRd = ID/EX.RegisterRs 
+    EX/MEM.RegisterRd = ID/EX.RegisterRt
+    MEM/WB.RegisterRd = ID/EX.RegisterRs 
+    MEM/WB.RegisterRd = ID/EX.RegisterRt
+
+Note this is only accurate when the instruction needs to write registers, therefore `RegWrite` should be asserted. Also, weird rule of `$0` [TODO] indicates that do not forwarding if the destination register is `$0`. We summarize three rules as following condition:
+
+    if (EX/MEM.RegWrite
+    and (EX/MEM.RegisterRd != 0)
+    and (EX/MEM.RegisterRd = ID/EX.RegisterRs)) ForwardA = 10
+
+    if (EX/MEM.RegWrite
+    and (EX/MEM.RegisterRd != 0)
+    and (EX/MEM.RegisterRd = ID/EX.RegisterRt)) ForwardB = 10
+
+- `ForwardA` and `ForwardB` are control bits for 2 MUX of forwarding. `01` selects forwarding values from EX/MEM.
+- Such condition detection is applied only for first 2 rules (EX hazards)
+
+As for MEM hazards, it occurs when a sequence of instructions will all read and write the same register, making values at MEM stage to be the most recent values
+
+    if (MEM/WB.RegWrite
+    and (MEM/WB.RegisterRd != 0)
+    and (EX/MEM.RegisterRd != ID/EX.RegisterRs)
+    and (MEM/WB.RegisterRd = ID/EX.RegisterRs)) ForwardA = 01
+
+    if (MEM/WB.RegWrite
+    and (MEM/WB.RegisterRd != 0)
+    and (EX/MEM.RegisterRd != ID/EX.RegisterRt)
+    and (MEM/WB.RegisterRd = ID/EX.RegisterRt)) ForwardB = 01
+
+- MEM stage is the _most_ recent
+    - it is different from EX/MEM values
+- an example would be summing a vector of numbers into a single register
+- `01` selects forwarding values from MEM/WB
+
+### Data hazards and stall
+
+***
+
+Occurs when one instruction tries to read a register after a load instruction writes the same register. The read instruction has to wait.
+
+    if (ID/EX.MemRead and
+        (
+            (ID/EX.RegisterRt = IF/ID.RegisterRs) or
+            (ID/EX.RegisterRt = IF/ID.RegisterRt)
+        )
+       )
+        stall the pipeline
+
+- `MemRead` should be asserted since only `lw` will read the memory
+- 2nd and 3rd lines check if the destination EX tries to write to is the target the next instruction tries to read from
+- stall is impelemented by `nop` signal that deasserting all 9 control signals
+    - no written if all `0`
+    - a MUX added after the control unit to select the normal control bit or all `0`s
+
+### Branch hazards
+
+***
+
+The decision of a branch instruction like `beq` would not occur until its MEM stage, forcing the next instruction to wait until then. 2 ways of solving it:
+
+#### Always assume branch not taken
+
+- assume not taken, continue sequentially in instructions
+- if wrong, 
+    - zero all control bits (like a _stall_)
+    - flush instructions in IF, ID and EX stages
+    - change `$pc`?
+- then take the branched instruction
+    - how?
+- if the probability of untaken is 0.5, we reduce half of the cost of control hazard.
+
+#### Dynamic prediction
+
+Have a history record of the decision on each branch, predict the current one based on history.
+
+- deeper piplines increase branch penlty
+- a branch predction buffer
+- 1-bit prediction scheme
+    - store whether branch is taken last time
+    - we assume it is the same as the last one
+    - example: a loop that branches 9 times in a row, and then untaken for once
+        - the first and last would definitely be wrong
+        - 80% accuracy for a branch taken 90% of the time
+- 2-bit prediction scheme
+    - change the buffer only if predict wrong twice in a row
+
+[TODO: delay]
