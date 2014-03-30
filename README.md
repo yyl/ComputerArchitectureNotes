@@ -9,3 +9,6 @@ Topics:
 - instruction sets
 - datapath
 - pipeline
+- ...
+
+Questions of first and second topics are also included.
