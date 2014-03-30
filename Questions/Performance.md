@@ -13,6 +13,8 @@ ANS
 1. decrease response time, also increasing throughput
 2. increase throughput
 
+***
+
 Q
 
 Our favorite program runs in 10 seconds on computer A, which has a 4 GHz clock. We are trying to help a computer designer build a computer, B, that will run this program in 6 seconds. The designer has determined that a substantial increase in the clock rate is possible, but this increase will affect the rest of the CPU design, causing computer B to require 1.2 times as many clock cycles as computer A for this program. What clock rate should we tell the designer to target?
@@ -34,6 +36,8 @@ For `B`,
                          = 1.2 x 4 x 10^10 / 6
                          = 8 GHz
 
+***
+
 Q
 
 Suppose we have two implementations of the same instruction set architecture. Computer A has a clock cycle time of 250 ps and a CPI of 2.0 for some program, and computer B has a clock cycle time of 500 ps and a CPI of 1.2 for the same program. Which computer is faster for this program, and by how much?
@@ -49,7 +53,10 @@ Therefore,
 
 `A` is 1.2 times faster.
 
+***
+
 Q
+
 ![Q1](pq1.png)
 
 ANS
@@ -61,7 +68,10 @@ ANS
 
 Code sequence `1` has most instructions. `2` would be faster.
 
+***
+
 Q
+
 ![Q2](pq2.png)
 
 ANS
