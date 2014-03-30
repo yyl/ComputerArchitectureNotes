@@ -12,9 +12,7 @@
     - IC_i: Instruction Count of instruction _i_ in given program
     - CPI_i: Clock-cycle needed Per Instruction _i_ with given CPU
 - clock cycle period = 1 / clock rate
-- note
-
-    Performance = 1 / CPU Time
+- note `Performance = 1 / CPU Time`
 
 Alternatively we have Million Instruction Per Second (MIPS),
     
