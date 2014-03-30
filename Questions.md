@@ -132,4 +132,5 @@ ANS
 - return to caller
 - for `L1`: decrement `$a0` (`n`) by 1, then call `fact`
 - last 5 instructions are where `fact` returns, restore old values, adjust `$sp` and compute `n*fact(n-1)` and return to initial caller.
+
 ***
