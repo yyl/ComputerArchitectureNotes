@@ -9,9 +9,7 @@ Q
 
 Assume variable `h` in `$s2` and the base address of array `A` is in `$s3`. What is the MIPS assembly code for the C assignment statement below?
 
-```assembly
-A[12] = h + A[8];
-```
+    A[12] = h + A[8];
 
 ANS
 
@@ -28,6 +26,7 @@ If the five variables `f, g, h, i, j` correspond to the five registers `$s0` thr
     if (i == j) f = g + h; else f = g – h;
 
 ANS
+
     bne $s3, $s4, ELSE
     add $s0, $s1, $s2
     j EXIT
