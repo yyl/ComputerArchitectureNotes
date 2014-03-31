@@ -5,12 +5,15 @@
 
 > Execution time is the only valid and unimpeachable measure of performance.
 
-    CPU Time = execution time = # of clock cycles x clock cycle period
+    CPU Time = execution time = IC x CPI x clock cycle period
 
 - the value varies for different program running on different CPUs
-- `# of clock cycles = sum(CPI_i x IC_i)`
-    - IC_i: Instruction Count of instruction _i_ in given program
-    - CPI_i: Clock-cycle needed Per Instruction _i_ with given CPU
+- IC: Instruction Count
+- CPI: Cycle Per Instruction
+    - actually is average CPI of different instructions
+    - `sum(CPI_i x IC_i) / IC`
+        - `CPI_i`: CPI of instruction i
+        - `IC_i`: $ of instructions i in the program
 - clock cycle period = 1 / clock rate
 - note
 
