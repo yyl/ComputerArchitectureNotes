@@ -14,8 +14,8 @@
     - `funct`: the specific variant of the operation defined by `op`
 - I-type
     - `op` is the same
-    - in `lw`: `rs` stores the base address in memory, `rd` is the destination register
-    - in other I-type operand: `rs` stores source operand and `rd` stores destination info
+    - in `sw`: `rs` stores the destination info, `rt` stores value to write
+    - in other I-type operand: `rs` stores source operand and `rt` stores address of destination register
 - word
     - 32-bit long, could be the data stored in register, an MIPS instruction
     - alignment restriction: in memory the address of storing each word must start with a multiple of 4 (0, 4, 8, 12...)

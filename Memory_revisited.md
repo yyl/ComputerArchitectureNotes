@@ -17,7 +17,7 @@ Given cache size as `2^n` blocks, block size as `2^m` words, word size as `32` b
 - bits of tag field: `32 - n - m - 2`
 	- 32 bits address in total
 	- `n` bits used as index
-	- `m` bits used within each block
+	- `m` bits used within each block [**block** **offset**]
 	- 2 bits used within each word
 	- rest goes to tag
 
@@ -33,4 +33,8 @@ Given cache size as `2^n` blocks, block size as `2^m` words, word size as `32` b
 
 #### VM
 
-[TODO]
+- virtual address size
+- page size
+- page table entry
+- page table size
+- # of PTEs

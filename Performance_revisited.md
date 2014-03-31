@@ -17,6 +17,13 @@
 - clock cycle period = 1 / clock rate
 - note `Performance = 1 / CPU Time`
 
+If given CPI for different instruction classes, we have
+
+    CPU Time = execution time = sum(CPI_i x IC_i) x clock cycle period
+
+- `CPI_i`: average CPI for instruction class i
+- `IC_i`: # of instruction of class i in the program
+
 Alternatively we have Million Instruction Per Second (MIPS),
     
     MIPS = instruction count / (10^6 x execution time)
@@ -42,3 +49,8 @@ Faster machines have higher `MIPS`, however:
     miss penalty = memory/cache access time x clock rate
 
 - Total CPI: expected CPI including the possibility of miss
+
+    AMAT = L1 hit time + L1 miss rate x (L2 hit time + L2 miss rate x Memory access time)
+
+- AMAT: Average Memory Access Time
+- when L1 miss, we access L2; when L2 miss, we access memory
