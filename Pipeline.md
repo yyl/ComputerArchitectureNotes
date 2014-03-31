@@ -167,11 +167,15 @@ The decision of a branch instruction like `beq` would not occur until its MEM st
 
 - assume not taken, continue sequentially in instructions
 - if wrong, 
-    - zero all control bits (like a _stall_)
+    - zero all control bits (like a _stall_): discard the instruction
     - flush instructions in IF, ID and EX stages
-    - change `$pc`?
 - then take the branched instruction
     - how?
+    - reduce the cost of retaking a branch
+        - move branch decision up from MEM
+            - move address calculation from EX to ID as we already have `$pc` and immediate fields for calculationg target address
+            - move branch decision
+        - reduce cost to only 1 instruction (was 2)
 - if the probability of untaken is 0.5, we reduce half of the cost of control hazard.
 
 #### Dynamic prediction
@@ -179,7 +183,10 @@ The decision of a branch instruction like `beq` would not occur until its MEM st
 Have a history record of the decision on each branch, predict the current one based on history.
 
 - deeper piplines increase branch penlty
-- a branch predction buffer
+- a branch prediction buffer
+    - a small memory
+    - indexed by lower portion of the address of the branch instruction
+    - have 1 or more bits indicating branch taking history
 - 1-bit prediction scheme
     - store whether branch is taken last time
     - we assume it is the same as the last one
@@ -189,4 +196,16 @@ Have a history record of the decision on each branch, predict the current one ba
 - 2-bit prediction scheme
     - change the buffer only if predict wrong twice in a row
 
-[TODO: delay]
+#### Branch delay
+
+Place an instruction that always executes after the branch to fill the gap waiting for branch decision.
+
+- branch execution will be delayed by one instruction
+- effective in 5-stage, but in longer pipelines more instructions needed to fill the gap, which is insufficient
+- choose the instruction from
+    - code before branch
+        - best
+        - has to be possible
+    - the branch target
+        - has to be a high-probability branch
+    - fall through
