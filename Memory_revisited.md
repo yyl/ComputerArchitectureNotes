@@ -31,10 +31,12 @@ Given cache size as `2^n` blocks, block size as `2^m` words, word size as `32` b
 - `n - k`: bits of index field
 - bits of tag size increases along with `k` because it has to identify each block within each set
 
-#### VM
+### VM
 
-- virtual address size
-- page size
-- page table entry
-- page table size
-- # of PTEs
+Given virtual address size 32 bits,
+
+- each application could have `2^32` bits virtual memory space
+- `# of PTE entries = # of pages in virtual memory = 2^32 / page size`
+- `PTE size = physical address bits + 1-bit valid + 1-bit dirty + 1-bit use`
+- `page table size in physical memory = # of PTEs x page table entry size`
+
