@@ -9,6 +9,7 @@ Topics:
 - instruction sets
 - datapath
 - pipeline
-- ...
+- memory
+- I/O
 
-Questions of first and second topics are also included.
+Questions of some of the topics are also included.
