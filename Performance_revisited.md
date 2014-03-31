@@ -15,9 +15,7 @@
         - `CPI_i`: CPI of instruction i
         - `IC_i`: $ of instructions i in the program
 - clock cycle period = 1 / clock rate
-- note
-
-    Performance = 1 / CPU Time
+- note `Performance = 1 / CPU Time`
 
 Alternatively we have Million Instruction Per Second (MIPS),
     
