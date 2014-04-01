@@ -3,28 +3,26 @@ Pipelining
 
 > Parallelism
 
-Pipelining is an _implementation_ technique to alow multiple instructions overlapped (i.e. executed at the same time). It makes processor fast by increasing its throughput. Note the actual time to complete single instruction does not change.
+Pipelining is an _implementation_ technique to alow multiple instructions overlapped (i.e. executed at the same time). It makes processor fast by increasing its **throughput**. Note the actual time to complete single instruction does not change.
 
 We splits MIPS instructions into 5 stages. Theoretically a full pipe could make the processor _five_ times faster. However in reality it is just closer to five when pipe gets longer. 
 
 Hazards in pipelining include:
 
 1. Structural hazards: the hardware cannot support the combinations of instructions we want in the same cycle
-    - can a single unit be shared in the same cycle?
-    - MIPS has two memories?
 2. Data hazards: one step must wait for another to complete (wait for data mostly)
     - resolved by _forwarding_: forward the data needed directly to next instruction without putting it into reg
-    - graphical representation of different MIPS instructions
 3. Control hazards: make a decision based on the results of one instruction while others are executing
     - mostly for branching
-    - solution one: stall - too slow
-    - solution two: branch prediction
+    - solution 1: stall - too slow
+    - solution 2: branch prediction
         - always predict to be one branch, or
         - _dynamic_ prediction: based on the past history
-    - solution three: delay decision
-        - execute some other instructions (say next sequetional instruction)
+    - solution 3: delay decision
+        - execute some other instructions (say next sequetional instruction) to fill the gap
         - then execute branch one
         - MIPS acutally use this
+        - good for 5-stage instruction set
 
 ### Representation of pipeline
 
@@ -92,7 +90,6 @@ An example,
 
 - last 4 instructions all depend on the result in `$2`, which is calculated by the 1st instruction.
 - but only 2nd and 3rd instructions create data hazard
-- only focus on forwarding to an operation in the **EX** stage
 
 #### detection of a data hazard
 
@@ -100,14 +97,16 @@ In the graph above, the 1st hazard occurs when `sub` is in MEM stage and followi
 
     EX/MEM.RegisterRd = ID/EX.RegisterRs = $2
 
-This is the detection rule of this type of hazard. A list of similar rules:
+This is data hazard as the next instruction is trying to access the register `$s2` which the current instruction has done writing with. 
+
+A list of similar rules:
     
     EX/MEM.RegisterRd = ID/EX.RegisterRs 
     EX/MEM.RegisterRd = ID/EX.RegisterRt
     MEM/WB.RegisterRd = ID/EX.RegisterRs 
     MEM/WB.RegisterRd = ID/EX.RegisterRt
 
-Note this is only accurate when the instruction needs to write registers, therefore `RegWrite` should be asserted. Also, weird rule of `$0` [TODO] indicates that do not forwarding if the destination register is `$0`. We summarize three rules as following condition:
+And corresponding hazard detection conditions for first two (EX hazard):
 
     if (EX/MEM.RegWrite
     and (EX/MEM.RegisterRd != 0)
@@ -117,10 +116,14 @@ Note this is only accurate when the instruction needs to write registers, theref
     and (EX/MEM.RegisterRd != 0)
     and (EX/MEM.RegisterRd = ID/EX.RegisterRt)) ForwardB = 10
 
-- `ForwardA` and `ForwardB` are control bits for 2 MUX of forwarding. `01` selects forwarding values from EX/MEM.
-- Such condition detection is applied only for first 2 rules (EX hazards)
+- `RegWrite` has to be asserted as it only happen when writing registers
+- do not forward possible nonzero of `$0`
+    - MIPS does not alllow nonzero values appear in operand register
+    - both `ID/EX.RegisterRt` and `ID/EX.RegisterRs` are operand register
+- trying to read (as source operand) the register which has done been written with
+- `ForwardA` and `ForwardB` are control bits for 2 MUX of forwarding. `01` forwards values from EX/MEM.
 
-As for MEM hazards, it occurs when a sequence of instructions will all read and write the same register, making values at MEM stage to be the most recent values
+MEM hazards, 
 
     if (MEM/WB.RegWrite
     and (MEM/WB.RegisterRd != 0)
@@ -132,10 +135,12 @@ As for MEM hazards, it occurs when a sequence of instructions will all read and 
     and (EX/MEM.RegisterRd != ID/EX.RegisterRt)
     and (MEM/WB.RegisterRd = ID/EX.RegisterRt)) ForwardB = 01
 
-- MEM stage is the _most_ recent
-    - it is different from EX/MEM values
+- `RegWrite` should be active still
+- `$0` cannot be forwarded still
+- check if current destination register holds the latest value by comprating with same register but as source operand
+- occur when trying to read as operand, while latest result has been computed but has not been written yet
 - an example would be summing a vector of numbers into a single register
-- `01` selects forwarding values from MEM/WB
+- `01` forwards values from MEM/WB
 
 ### Data hazards and stall
 
@@ -161,7 +166,7 @@ Occurs when one instruction tries to read a register after a load instruction wr
 
 ***
 
-The decision of a branch instruction like `beq` would not occur until its MEM stage, forcing the next instruction to wait until then. 2 ways of solving it:
+The decision of a branch instruction like `beq` would not occur until its MEM stage, forcing the next instruction to wait until then. There are 3 solutions.
 
 #### Always assume branch not taken
 
