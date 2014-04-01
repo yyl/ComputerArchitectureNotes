@@ -3,7 +3,7 @@
 
     CPU Time = # of instructions per program x CPI x clock period
 
-Both CPI and clock period are determined by the processor. This note will use a simplified version of process as example. This processor includes 
+Both CPI and clock period are determined by the processor. Therefore the design of processor is crucial. This note will use a simplified version of process as example of processor design. It includes instructions of
 
 1. memory-reference: `lw`, `sw`
 2. arithmetic-logical: `and`, `sub`, `or`, `and`, `slt`
@@ -28,6 +28,7 @@ It allows one state element be read and written in one same cycle without creati
 #### Build the datapath part by part
 
 The starting steps are the same for any instructions:
+
 1. fetch the instruction from the memory according to `$pc`
 2. then increase value fetched from `$pc` by 4 _bytes_, which would be the address for the next instruction
 3. store the new value back to `$pc` to get ready for next instruction
@@ -40,9 +41,9 @@ The starting steps are the same for any instructions:
 Next, for _R-type_ instructions
 
 - including `add`, `or`, `slt`, etc
-- all registers of a processor are stored in a **register** **file**
+- all registers of a processor are stored in a **register file**
 - any register on the register file could be accessed by specifying a number
-- _R-type_: read 2 registers, perform ALU operation on them, and then write the result (either to memory or register)
+- read 2 registers, perform ALU operation on them, and then write the result (either to memory or register)
 - inputs needed:
     - read: two inputs of 5-bit to specify register numbers
     - write: one 5-bit specifying register number of the register to be written and one 32-bit input data to write
@@ -60,9 +61,9 @@ _I-type_ instructions,
     sw $t1,offset_val($t2)
 
 - both compute a memory address by adding the base address `$t2` with a 16-bit offset `offset_val` (_ALU_)
-- for `$lw`, write the value read from memory to `$t1` after computing (_register_ _file_)
-- or for `$sw`, write the value of `$t1` to the memory (_register_ _file_)
-- above operations need the _register_ _file_ and _ALU_ too from the _R-type_ elements
+- for `$lw`, write the value read from memory to `$t1` after computing (_register file_)
+- or for `$sw`, write the value of `$t1` (_register file_) to the memory 
+- above operations need the _register file_ and _ALU_ too from the _R-type_ elements
 - in addtion
     - sign-extend element: to extend the 16-bit offset to 32-bit for ALU (since it only takes in 32-bit data)
     - a data memory unit of course
@@ -77,34 +78,31 @@ as for branch instruction,
 - use a _ALU_ with control set as _subtract_ to do the comparison
     - return a 1-bit signal if result is 0
 - the offset field has to be extended to 32-bit and then shifted left 2 bits to be turned into a _word_ address (?)
-- need a **branch** **control** **logic**
+- need a **branch control logic**
     - if the brank is _taken_, the address of the next instruction is `offset + $pc + 4`
     - else still `$pc + 4`
 
 ![branch instruction elements](images/branch_instruction_elements.png)
 
-as for the _jump_ instruction, the operation replaces the lower 28 bits of the result of `$pc + 4` with the lwoer 26 bits of the fetched jump instruction shifted left by 2 bits
-
-![Jump instruction elements](images/jump_instruction_elements.png)
-
 #### Implementation
 
 Combine them without any controls first:
 
-Single-cycle: to execute all instructions in one cycle
-    - cycle time would be determined by the longest path
-    - no resource could be used more than once; possible need for duplication
+Single cycle
+- to execute all instructions in one cycle
+- cycle time would be determined by the longest path
+- no resource could be used more than once; possible need for duplication
 
 ![Single cycle datapath](images/single_cycle_datapath.png)
 
 - use _MUX_ and control signals to select from multiple inputs for different instructions
-- incomplete: need **control** **unit**, `j`
+- incomplete: need **control unit**, `jr`
 
 Add controls:
 
-- need a **control** **unit** to decide which ALU function needed and which signal should be asserted
-- input of **control** **unit**: `funct` and `opcode` fields in the instruction
-- need to generate a 4-bit ALU selection based on the 2-bit **ALUOp** control field generated from **control** **unit**
+- need a **control unit** to decide which ALU function needed and which signal should be asserted
+- input of **control unit**: `funct` and `opcode` fields in the instruction
+- need to generate a 4-bit ALU selection based on the 2-bit **ALUOp** control field generated from **control unit**
 
 ![Control unit](images/control_unit.png)
 
@@ -112,31 +110,36 @@ Then we add _MUX_ bits and identify signals:
 
 ![Identify control signals](images/identify_signals.png)
 
-- `Instruction[31:26]` are the `opcode`
+- `Instruction[31:26]` are the 6-bit `opcode`
 - `Instruction[5:0]` indicates the last 6 bits `funct` field in instruction
 - `Instruction[15:0]` indicates the lower 16 bits `offset` field in instruction
 - Two regisers needed to be read (`rs` and `rt`) are always `Instruction[25:21]` and `Instruction[20:16]`
 - destination register to be written: for `lw` is `rt` (`[20:16]`), for _R-type_ is `rd` (`[15:11]`)
 - in total seven 1-bit signals and a 2-bit _ALUOp_ for ALU
-- efect of 1-bit signals:
+- effect of 1-bit signals:
 
 ![Effect of 1-bit signals](images/effect_control_bits.png)
+
+Control bits for differen types of instructions
 
 ![Control signals for different instructions](images/set_control_bits.png)
 
 - the setting of control signals is entirely determined by `opcode`
 - `funct` and _ALUOp_ determine the ALU action
 
-Now simple datapath with controls AND jump function:
+Simple datapath with controls AND jump function:
 
 ![Datapath with control](images/datapath_with_control.png)
 
-- jump is implemented [TODO:fix]
-- how to implement `jal`?
+- jump is implemented
+    - like branch, but different way computing `$pc`, and not conditional
+    - `[1:0]` are `00`
+    - `[27:2]` are from the 26-bit immediate of the instruction
+    - `[31:28]` are upper 4 bits of curreng `$pc + 4`
 
 ### Single-cycle is bad
 
 - because the clock cycle of single-cycle datapath is determined by the slowest instruction
 - cannot make common case fast
-- units cannot be shared during a clock cycle (?)
+- units cannot be shared during a clock cycle
 
